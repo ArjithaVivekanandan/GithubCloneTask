@@ -22,6 +22,7 @@ error_me.innerHTML = "Oooops..No Records Found!!!";
 
 //Get user list    
 async function userApiCall() {
+ 
   content.innerHTML = "";
   search_str = document.getElementById("search_text").value;
 
@@ -62,7 +63,7 @@ function handleResponse(response) {
       title_div.setAttribute("class", "text-danger");
       title_div.innerHTML = item;
 
-      var repo_link = document.createElement("a");
+      var repo_link = document.createElement("button");
       repo_link.setAttribute("class", "btn btn-primary");
 
       repo_link.onclick = function () { ViewRepository(element.repos_url) };
@@ -88,6 +89,7 @@ function handleResponse(response) {
 
 //Obtain Repository list of user
 async function ViewRepository(repoApi) {
+  
   content.innerHTML = "";
 
   var repoRequest = await (await fetch(repoApi)).json();
@@ -108,7 +110,7 @@ function handleRepo(repoResponse) {
 
     var repoPageTitle = document.createElement("h3");
     repoPageTitle.setAttribute("class", "row mb-1 p-3 text-dark");
-    repoPageTitle.innerHTML = "List of Repositories";
+    repoPageTitle.innerHTML = "Click to view list of files in Repository";
 
     Repopage_div.append(repoPageTitle);
     for (var i = 0; i < repoResponse.length; i++) {
@@ -117,7 +119,7 @@ function handleRepo(repoResponse) {
       var Repo_div = document.createElement("div");
       Repo_div.setAttribute("class", "row text-justify");
 
-      var repo_title_div = document.createElement("a");
+      var repo_title_div = document.createElement("u");
       repo_title_div.setAttribute("class", "row mb-1 p-5 text-primary h4");
 
       var temp = repoResponse[i].full_name;
@@ -142,7 +144,7 @@ function handleRepo(repoResponse) {
 
 //Get Repository files list
 async function ViewRepositoryFiles(repofullName) {
-
+  
   content.innerHTML = "";
   var repofilesApi = "https://api.github.com/repos/" + repofullName + "/contents";
   var repofilesRequest = await (await fetch(repofilesApi)).json();
@@ -163,7 +165,8 @@ function handleRepofiles(repofilesResponse) {
 
     var filePageTitle = document.createElement("h3");
     filePageTitle.setAttribute("class", "row mb-1 p-3 text-dark");
-    filePageTitle.innerHTML = "List of files in the Repository";
+    filePageTitle.innerHTML = "Click to view each file";
+
 
     Repofiles_div.append(filePageTitle);
 
@@ -171,11 +174,15 @@ function handleRepofiles(repofilesResponse) {
 
       var repofileitem = fileElement.name;
 
-      var repofiles_title_div = document.createElement("p");
+      var repofiles_title_div = document.createElement("a");
       repofiles_title_div.setAttribute("class", "row mb-1 p-4 text-primary h4");
+      repofiles_title_div.setAttribute("href",fileElement.html_url);
+      repofiles_title_div.setAttribute("target","_blank");
 
 
       repofiles_title_div.innerHTML += repofileitem;
+
+      
 
       Repofiles_div.innerHTML += repofiles_title_div.outerHTML;
 
@@ -193,6 +200,7 @@ function handleRepofiles(repofilesResponse) {
 //Search by Repository Name
 
 async function ViewRepositoryApiCall() {
+  
   content.innerHTML = "";
   search_str = document.getElementById("search_text").value;
   var repoData = await (await fetch("https://api.github.com/search/repositories?q=" + search_str + "in:name")).json();
@@ -214,7 +222,9 @@ function handleViewRepoResponse(viewResponse) {
 
     var viewRepo_divTitle = document.createElement("h3");
     viewRepo_divTitle.setAttribute("class", "row mb-1 p-3 text-dark");
-    viewRepo_divTitle.innerHTML = "List of Repositories";
+    viewRepo_divTitle.innerHTML = "Click to view files in Repositories";
+
+   
 
     viewRepo_div.append(viewRepo_divTitle);
 
@@ -225,7 +235,7 @@ function handleViewRepoResponse(viewResponse) {
       var viewRepolist_div = document.createElement("div");
       viewRepolist_div.setAttribute("class", "row text-justify");
 
-      var viewrepo_title_div = document.createElement("a");
+      var viewrepo_title_div = document.createElement("u");
       viewrepo_title_div.setAttribute("class", "row mb-1 p-5 text-primary h4");
 
       viewrepo_title_div.onclick = function () { ViewRepositoryFiles(viewRepoitem) };

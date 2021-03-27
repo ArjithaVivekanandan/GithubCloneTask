@@ -6,22 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Githubclone Application</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
-    
+    <style>
+        body{
+            font-family: 'Mukta', sans-serif;
+        }
+    </style>
 </head>
 <body>
     
-    <h2 class="text-danger text-center m-2" style="font-family: 'Josefin Sans', sans-serif;">Github Clone Application</h3>
-        <div class="container text-dark h6 text-justify" style="font-family: 'Josefin Sans', sans-serif;">  
+    <h2 class="text-danger text-center m-2" >Github Clone Application</h3>
+        <div class="container text-dark h6 text-justify">  
                   
-            <input type="text" class="form-control text-muted" id="search_text" placeholder="Search Users"></input>
+            <input type="text" class="form-control text-muted" id="search_text" placeholder="Search"></input>
+            
             <br>
             <div class="text-center">
-            <button type="button" class="row btn btn-warning text-dark" id="search_submit" onclick="userApiCall()">Submit</button>
+            <button type="button" class="row btn btn-warning" id="searchusers_submit" onclick="userApiCall()"></button>
+            
             </div>
             <br>
-            <div id="content" class="row text-justify" style="font-family: 'Josefin Sans', sans-serif;"></div>
+            <div class="text-center">
+                
+                <button type="button" class="row btn btn-warning" id="searchrepo_submit" onclick="ViewRepositoryApiCall()"></button>
+                </div>
+                <br>
+            <div id="content" class="row text-justify" ></div>
  
      </div>
     

@@ -83,7 +83,7 @@ function handleResponse(response) {
 
 
   //Obtain Repository list of user
- async function ViewRepository(repoApi){
+  async function ViewRepository(repoApi){
     content.innerHTML="";  
   
     var repoRequest= await (await fetch(repoApi)).json();
@@ -96,25 +96,38 @@ function handleResponse(response) {
 
   //Parse and append Repository list to html tags
   function handleRepo(repoResponse){
-    console.log(repoResponse);
+    
     try{
-      var repo_title_div = document.createElement("a");
-        repo_title_div.setAttribute("class","text-primary h4");
+     
+      var Repopage_div=document.createElement("div");
+      Repopage_div.setAttribute("class","container text-justify");
 
-      for (var i = 0; i < repoResponse.length; i++) 
-      {
-        var repoitem = repoResponse[i].name;
+      var repoPageTitle=document.createElement("h3");
+      repoPageTitle.setAttribute("class","row mb-1 p-3 text-success");
+      repoPageTitle.innerHTML="List of Repositories";
+     
+      Repopage_div.append(repoPageTitle);
+    for (var i = 0; i < repoResponse.length; i++) 
+    {
+     var repoitem = repoResponse[i].name;
 
-        
-        
-         
-        repo_title_div.innerHTML+= "<br>"+repoitem+"<br>";
+     var Repo_div=document.createElement("div");
+     Repo_div.setAttribute("class","row text-justify");
 
-        
+     var repo_title_div = document.createElement("a");
+     repo_title_div.setAttribute("class","row mb-1 p-4 text-primary h4");
+     
+     var temp=repoResponse[i].full_name;
+     repo_title_div.onclick=function() { ViewRepositoryFiles(temp) };
+
+     repo_title_div.innerHTML=repoitem;
+
+     Repo_div.append(repo_title_div);
+     Repopage_div.append(Repo_div);
      
     }
-    
-    document.getElementById("content").append(repo_title_div);
+    document.getElementById("content").append(Repopage_div);
+
   }
   catch{
     
@@ -123,5 +136,57 @@ function handleResponse(response) {
 
   }
 
+
+  //Get Repository files list
+  async function ViewRepositoryFiles(repofullName)
+  {
+    
+    content.innerHTML="";  
+    var repofilesApi="https://api.github.com/repos/"+repofullName+"/contents";
+    var repofilesRequest= await (await fetch(repofilesApi)).json();
+    if(repofilesRequest.length>0)
+    {
+    return handleRepofiles(repofilesRequest);
+    }
+    else
+    document.getElementById("content").innerHTML = error_me.outerHTML;
+  }
+
+
+//Obtain Repository file name and append to html tags
+  function handleRepofiles(repofilesResponse){
+    
+    try{
+      var Repofiles_div=document.createElement("div");
+      Repofiles_div.setAttribute("class","container text-justify");
+
+      var filePageTitle=document.createElement("h3");
+      filePageTitle.setAttribute("class","row mb-1 p-3 text-success");
+      filePageTitle.innerHTML="List of files in the Repository";
+      
+      Repofiles_div.append(filePageTitle);
+
+      repofilesResponse.forEach(fileElement=>{
+    
+      var repofileitem = fileElement.name;
+
+     var repofiles_title_div = document.createElement("p");
+     repofiles_title_div.setAttribute("class","row mb-1 p-4 text-primary h4");
+     
+
+     repofiles_title_div.innerHTML+=repofileitem;
+
+     Repofiles_div.innerHTML +=  repofiles_title_div.outerHTML;
+     
+    });
+    document.getElementById("content").append(Repofiles_div);
+
+  }
+  catch{
+    
+    document.getElementById("content").innerHTML = error_me.outerHTML;
+  }
+
+  }
   
   

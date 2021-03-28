@@ -1,5 +1,7 @@
+//Declaration to read value from input text box
 var search_str;
 
+//Append text for buttons
 document.getElementById("searchusers_submit").innerHTML = "Search By Users";
 document.getElementById("searchrepo_submit").innerHTML = "Search By Repository";
 
@@ -8,31 +10,38 @@ document.getElementById("searchrepo_submit").innerHTML = "Search By Repository";
 document.getElementById("search_text").addEventListener("keypress", function (event) {
 
   if (event.key === "Enter") {
-
-    document.getElementById("content").innerHTML = "Please click on the button by which Search needs to be done.";
+    alert("Please click on the button by which Search needs to be done");
 
   }
 });
 
 //Error Message Div 
 var error_me = document.createElement("div");
-error_me.setAttribute("class", "text-danger h2");
-error_me.innerHTML = "Oooops..No Records Found!!!";
+error_me.setAttribute("class", "alert alert-danger h5");
+error_me.setAttribute("role", "alert");
+
 
 
 //Get user list    
 async function userApiCall() {
- 
+
   content.innerHTML = "";
   search_str = document.getElementById("search_text").value;
+  if (search_str != "") {
+    search_str = search_str.split(" ").join("");
+    var userData = await (await fetch("https://api.github.com/search/users?q=" + search_str + "+in:user")).json();
 
-  var userData = await (await fetch("https://api.github.com/search/users?q=" + search_str + "+in:user")).json();
+    if (userData.total_count > 0) {
 
-  if (userData.total_count > 0) {
-
-    return handleResponse(userData);
+      return handleResponse(userData);
+    }
+    else {
+      error_me.innerHTML = "Oooops..No Records Found!!!";
+      document.getElementById("content").innerHTML = error_me.outerHTML;
+    }
   }
   else {
+    error_me.innerHTML = "Please Enter Username or Repository ]to Search!!";
     document.getElementById("content").innerHTML = error_me.outerHTML;
   }
 }
@@ -50,7 +59,8 @@ function handleResponse(response) {
       cardgroup.setAttribute("class", "col sm-12 md-6 lg-4 mb-4");
 
       var card = document.createElement("div");
-      card.setAttribute("style", "border:2px solid beige;width:20rem");
+      card.setAttribute("style", "width:20rem");
+      card.setAttribute("class", "shadow-lg bg-light rounded");
 
       var image_div = document.createElement("img");
       image_div.setAttribute("class", "card-img-top");
@@ -59,8 +69,8 @@ function handleResponse(response) {
       var card_body_div = document.createElement("div");
       card_body_div.setAttribute("class", "card-body");
 
-      var title_div = document.createElement("h6");
-      title_div.setAttribute("class", "text-danger");
+      var title_div = document.createElement("h5");
+      title_div.setAttribute("class", "text-dark");
       title_div.innerHTML = item;
 
       var repo_link = document.createElement("button");
@@ -81,7 +91,7 @@ function handleResponse(response) {
 
   }
   catch {
-
+    error_me.innerHTML = "Oooops..No Records Found!!!";
     document.getElementById("content").innerHTML = error_me.outerHTML;
   }
 }
@@ -89,14 +99,16 @@ function handleResponse(response) {
 
 //Obtain Repository list of user
 async function ViewRepository(repoApi) {
-  
+
   content.innerHTML = "";
 
   var repoRequest = await (await fetch(repoApi)).json();
   if (repoRequest.length > 0)
     return handleRepo(repoRequest);
-  else
+  else {
+    error_me.innerHTML = "Oooops..No Records Found!!!";
     document.getElementById("content").innerHTML = error_me.outerHTML;
+  }
 
 }
 
@@ -108,34 +120,36 @@ function handleRepo(repoResponse) {
     var Repopage_div = document.createElement("div");
     Repopage_div.setAttribute("class", "container text-justify");
 
-    var repoPageTitle = document.createElement("h3");
-    repoPageTitle.setAttribute("class", "row mb-1 p-3 text-dark");
-    repoPageTitle.innerHTML = "Click to view list of files in Repository";
+    var repoPageTitle = document.createElement("h5");
+    repoPageTitle.setAttribute("class", "row mb-1 p-1 text-dark");
+    repoPageTitle.innerHTML = "Click on Repository Name to view files";
 
     Repopage_div.append(repoPageTitle);
-    for (var i = 0; i < repoResponse.length; i++) {
-      var repoitem = repoResponse[i].name;
+
+
+    repoResponse.forEach(RespElement => {
+      var repoitem = RespElement.name;
 
       var Repo_div = document.createElement("div");
       Repo_div.setAttribute("class", "row text-justify");
 
       var repo_title_div = document.createElement("u");
-      repo_title_div.setAttribute("class", "row mb-1 p-5 text-primary h4");
+      repo_title_div.setAttribute("class", "row p-4 text-primary");
 
-      var temp = repoResponse[i].full_name;
-      repo_title_div.onclick = function () { ViewRepositoryFiles(temp) };
+
+      repo_title_div.onclick = function () { ViewRepositoryFiles(RespElement.full_name) };
 
       repo_title_div.innerHTML = repoitem;
 
       Repo_div.append(repo_title_div);
       Repopage_div.append(Repo_div);
 
-    }
+    })
     document.getElementById("content").append(Repopage_div);
 
   }
   catch {
-
+    error_me.innerHTML = "Oooops..No Records Found!!!";
     document.getElementById("content").innerHTML = error_me.outerHTML;
   }
 
@@ -144,27 +158,30 @@ function handleRepo(repoResponse) {
 
 //Get Repository files list
 async function ViewRepositoryFiles(repofullName) {
-  
+  console.log(repofullName);
   content.innerHTML = "";
   var repofilesApi = "https://api.github.com/repos/" + repofullName + "/contents";
   var repofilesRequest = await (await fetch(repofilesApi)).json();
   if (repofilesRequest.length > 0) {
     return handleRepofiles(repofilesRequest);
   }
-  else
+  else {
+    error_me.innerHTML = "Oooops..No Records Found!!!";
     document.getElementById("content").innerHTML = error_me.outerHTML;
+  }
 }
 
 
 //Obtain Repository file name and append to html tags
 function handleRepofiles(repofilesResponse) {
+  console.log(repofilesResponse);
 
   try {
     var Repofiles_div = document.createElement("div");
     Repofiles_div.setAttribute("class", "container text-justify");
 
-    var filePageTitle = document.createElement("h3");
-    filePageTitle.setAttribute("class", "row mb-1 p-3 text-dark");
+    var filePageTitle = document.createElement("h5");
+    filePageTitle.setAttribute("class", "row mb-1 p-1 text-dark");
     filePageTitle.innerHTML = "Click to view each file";
 
 
@@ -175,14 +192,14 @@ function handleRepofiles(repofilesResponse) {
       var repofileitem = fileElement.name;
 
       var repofiles_title_div = document.createElement("a");
-      repofiles_title_div.setAttribute("class", "row mb-1 p-4 text-primary h4");
-      repofiles_title_div.setAttribute("href",fileElement.html_url);
-      repofiles_title_div.setAttribute("target","_blank");
+      repofiles_title_div.setAttribute("class", "row p-4 text-primary");
+      repofiles_title_div.setAttribute("href", fileElement.html_url);
+      repofiles_title_div.setAttribute("target", "_blank");
 
 
       repofiles_title_div.innerHTML += repofileitem;
 
-      
+
 
       Repofiles_div.innerHTML += repofiles_title_div.outerHTML;
 
@@ -191,7 +208,7 @@ function handleRepofiles(repofilesResponse) {
 
   }
   catch {
-
+    error_me.innerHTML = "Oooops..No Records Found!!!";
     document.getElementById("content").innerHTML = error_me.outerHTML;
   }
 
@@ -200,15 +217,22 @@ function handleRepofiles(repofilesResponse) {
 //Search by Repository Name
 
 async function ViewRepositoryApiCall() {
-  
+
   content.innerHTML = "";
   search_str = document.getElementById("search_text").value;
-  var repoData = await (await fetch("https://api.github.com/search/repositories?q=" + search_str + "in:name")).json();
-  if (repoData.total_count > 0) {
+  if (search_str != "") {
+    search_str = search_str.split(" ").join("");
+    var repoData = await (await fetch("https://api.github.com/search/repositories?q=" + search_str + "in:name")).json();
+    if (repoData.total_count > 0) {
 
-    return handleViewRepoResponse(repoData);
+      return handleViewRepoResponse(repoData);
+    }
+    else {
+      document.getElementById("content").innerHTML = error_me.outerHTML;
+    }
   }
   else {
+    error_me.innerHTML = "Please Enter Username or Repository ]to Search!!";
     document.getElementById("content").innerHTML = error_me.outerHTML;
   }
 }
@@ -220,11 +244,11 @@ function handleViewRepoResponse(viewResponse) {
     var viewRepo_div = document.createElement("div");
     viewRepo_div.setAttribute("class", "container text-justify");
 
-    var viewRepo_divTitle = document.createElement("h3");
-    viewRepo_divTitle.setAttribute("class", "row mb-1 p-3 text-dark");
+    var viewRepo_divTitle = document.createElement("h5");
+    viewRepo_divTitle.setAttribute("class", "row mb-1 p-1 text-dark");
     viewRepo_divTitle.innerHTML = "Click to view files in Repositories";
 
-   
+
 
     viewRepo_div.append(viewRepo_divTitle);
 
@@ -236,7 +260,7 @@ function handleViewRepoResponse(viewResponse) {
       viewRepolist_div.setAttribute("class", "row text-justify");
 
       var viewrepo_title_div = document.createElement("u");
-      viewrepo_title_div.setAttribute("class", "row mb-1 p-5 text-primary h4");
+      viewrepo_title_div.setAttribute("class", "row p-4 text-primary");
 
       viewrepo_title_div.onclick = function () { ViewRepositoryFiles(viewRepoitem) };
 
@@ -250,7 +274,7 @@ function handleViewRepoResponse(viewResponse) {
 
   }
   catch {
-
+    error_me.innerHTML = "Oooops..No Records Found!!!";
     document.getElementById("content").innerHTML = error_me.outerHTML;
   }
 
